@@ -1,0 +1,37 @@
+{
+    "prepare_data_param": {
+      "volumeMul":24,
+      "ForcePeriod":12,
+      "fast_sma_period": 14,
+      "slow_sma_period": 28,
+      "resample": "60min",
+      "volume_period":24,
+      "mass_period":72,
+      "force_period":12,
+      "close_force_period":16
+    },
+    "trading_data_param": {
+      "SL_mode": "static_price",
+      "SL_pct": 0.03,
+      "TP_mode": "static_price",
+      "TP_ratio": 1.66,
+      "no_of_layer": 1,
+      "compound": true
+    },
+    "symbol": "ETHUSDT_UPERP",
+    "strategy_class": "ForceStrategy",
+    "exchange": "BINANCE",
+    "name": "ForceStrategy",
+    "short_code" : "ForceStrategy",
+    "strategy_details":{
+      "designer":"SL",
+      "design_date": "2023-06-15",
+      "status": "alpha_pool"
+    },
+    "asset_info":{
+      "asset_class": "CRYPTO"
+    },
+    "account_info":{
+      "capital": 10000
+    }
+  }

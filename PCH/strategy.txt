@@ -1,0 +1,45 @@
+// This Pine Script™ code is subject to the terms of the Mozilla Public License 2.0 at https://mozilla.org/MPL/2.0/
+// © seanhung07
+
+//@version=5
+strategy(title="DC PCH IOST", overlay=false, initial_capital=100, currency='USD', pyramiding=1, default_qty_type=strategy.percent_of_equity, default_qty_value=100, commission_value=0.04, margin_long = 1./5*20, margin_short = 1./5*20)
+
+length = input(50)
+stdmult = input(2.5)
+stdlowermult = input(1.5)
+lowerlength = input(100)
+
+open_long = input.string("open long", "Open Long Alert Message", group ="Autotrading")
+close_long = input.string("close long", "Close Long Alert Message", group ="Autotrading")
+open_short = input.string("open short", "Open Short Alert Message", group ="Autotrading")
+close_short = input.string("close short", "Close Short Alert Message", group ="Autotrading")
+
+[other_close] = request.security('BINANCE:WAVESUSDT.P', timeframe.period, [close])
+min = ta.min(close)
+max = ta.max(close)
+
+other_min = ta.min(other_close)
+other_max = ta.max(other_close)
+
+norm = (close - min) / (max - min)
+other_norm = (other_close - other_min) / (other_max - other_min)
+
+diff = math.abs(norm - other_norm)
+plot(diff)
+std = ta.sma(diff, length) + stdmult * ta.stdev(diff, length)
+plot(std, color=color.red)
+std_lower = ta.sma(diff, length) - stdlowermult * ta.stdev(diff, lowerlength)
+plot(std_lower, color=color.red)
+
+
+if ta.crossover(diff, std)
+    if other_norm > norm
+        strategy.entry("long", strategy.long, alert_message = open_long)
+    else
+        strategy.entry("short", strategy.short, alert_message  = open_short)
+if ta.crossunder(diff, std_lower)
+    if strategy.position_size > 0
+        strategy.close("long", alert_message = close_long)
+    else if strategy.position_size < 0
+        strategy.close("short", alert_message = close_short)
+// plotshape(diff > std, "enter", shape.diamond, location.abovebar)

@@ -1,0 +1,181 @@
+//@version=5
+indicator('Liquidation Map', overlay=true, max_lines_count=500, max_labels_count=1)
+
+string userSymbol = 'BINANCE' + ":" + string(syminfo.basecurrency) + 'USDT.P'
+string Formula = str.format("{0}_OI", userSymbol)
+// Calculate the Open Interest based on given formula, period and close prices
+OI = request.security(Formula, timeframe.period, close)
+
+// Compute the absolute difference between the current and previous Open Interest, adjusted by volume
+OI_delta = math.abs(OI - nz(OI[1])*volume)
+
+// Define the length of the moving average
+maLength = input(14, title="MA Length")
+
+// Set the number of lines (this might be used for plotting or other purposes, not shown in this snippet)
+numOfLines = 500
+
+// Calculate the absolute value of the OI_delta
+OI_delta_abs = math.abs(OI_delta)
+
+// Define liquidation levels based on user input for different percentiles
+h3 = input.float(0.90, title="Large Liquidation Level (90th Percentile)")
+h2 = input.float(0.75, title="Middle Liquidation Level (75th Percentile)")
+h1 = input.float(0.50, title="Small Liquidation Level (50th Percentile)")
+
+// Define a function to calculate percentile rank for a given value over a specified length
+percentileRank(value, length) =>
+    sum = 0.0
+    // Loop through all the values up to the specified length
+    for i = 0 to length - 1
+        // Count how many times the value is greater than the highest OI_delta_abs in the range
+        sum := sum + (value > ta.highest(OI_delta_abs, length)[i] ? 1 : 0)
+    // Compute the rank by dividing the count by the length
+    rank = sum / length
+    rank
+
+// Get the latest rank based on the recent OI_delta_abs and the MA length
+latest_rank = percentileRank(OI_delta_abs, maLength)
+
+
+
+// Assuming OI_delta_abs and OI_delta are already defined
+
+OI_delta_open_h3 = latest_rank >= h3 and OI_delta > 0
+OI_delta_open_h2 = latest_rank >= h2 and latest_rank < h3 and OI_delta > 0
+OI_delta_open_h1 = latest_rank >= h1 and latest_rank < h2 and OI_delta > 0
+
+kline_price = (close + close + high + low) / 4
+
+showLine = input(true, title="Show lines")
+showHist = input(true, title="Show histgram")
+showLocalOnly = input(true, title="Only show local liquidation levels")
+
+i_50xColor = input.color(color.rgb(2, 227, 252, 30), '50x Leverage color', group='50x Leverage')
+i_100xColor = input.color(color.rgb(241, 1, 1, 30), '100x Leverage color', group='100x Leverage')
+
+var h3Array = array.new_line()
+var h2Array = array.new_line()
+var h1Array = array.new_line()
+
+numOfBars = 250
+distLastCandle = 5
+local_high = ta.highest(high, numOfBars)
+local_low = ta.lowest(low, numOfBars)
+rangeHigh = local_high * (1 + local_high / local_low / 10)
+rangeLow = local_low * (1 - local_high / local_low / 10)
+rangeHeight = rangeHigh - rangeLow
+
+
+f_drawLine(_x1, _x2, _yValue, _lineColor, _style, _width) =>
+    line.new(x1=_x1, y1=_yValue, x2=_x2, y2=_yValue, color=_lineColor, style=_style, width=_width)
+
+f_extendArray(_lineArray, _extendLines) =>
+    if array.size(_lineArray) > 0
+        for _i = array.size(_lineArray) - 1 to 0 by 1
+
+            x2 = line.get_x2(array.get(_lineArray, _i))
+            yValue = line.get_y1(array.get(_lineArray, _i))
+
+            if _extendLines or bar_index - 1 == x2 - 1 and not(high > yValue and low < yValue)
+                line.set_x2(array.get(_lineArray, _i), bar_index + 1)
+
+f_calculateLeverage100x(_pivotValue, _shortSell) =>
+    _shortSell ? _pivotValue * (1 - 0.01) : _pivotValue * (1 + 0.01)
+
+f_calculateLeverage50x( _pivotValue, _shortSell) =>
+    _shortSell ? _pivotValue * (1 - 0.02) : _pivotValue * (1 + 0.02)
+
+float yValue = na
+int x1 = na
+int x2 = na
+line l = na
+
+x1 := bar_index
+x2 := bar_index
+
+f_append(Array, l) =>
+    if array.size(Array) == numOfLines
+        line.delete(array.shift(Array))
+    array.push(Array, l)
+
+if OI_delta_open_h3
+
+    yValue := f_calculateLeverage50x(kline_price, true)
+    l := f_drawLine(x1, x2, yValue, i_50xColor, line.style_solid, 1)
+    f_append(h3Array, l)
+
+    yValue := f_calculateLeverage50x(kline_price, false)
+    l := f_drawLine(x1, x2, yValue, i_50xColor, line.style_solid, 1)
+    f_append(h3Array, l)
+
+    yValue := f_calculateLeverage100x(kline_price, true)
+    l := f_drawLine(x1, x2, yValue, i_100xColor, line.style_solid, 1)
+    f_append(h3Array, l)
+
+    yValue := f_calculateLeverage100x(kline_price, false)
+    l := f_drawLine(x1, x2, yValue, i_100xColor, line.style_solid, 1)
+    f_append(h3Array, l)
+
+if OI_delta_open_h2
+
+    yValue := f_calculateLeverage50x(kline_price, true)
+    l := f_drawLine(x1, x2, yValue, i_50xColor, line.style_solid, 1)
+    f_append(h2Array, l)
+
+    yValue := f_calculateLeverage50x(kline_price, false)
+    l := f_drawLine(x1, x2, yValue, i_50xColor, line.style_solid, 1)
+    f_append(h2Array, l)
+
+    yValue := f_calculateLeverage100x(kline_price, true)
+    l := f_drawLine(x1, x2, yValue, i_100xColor, line.style_solid, 1)
+    f_append(h2Array, l)
+
+    yValue := f_calculateLeverage100x(kline_price, false)
+    l := f_drawLine(x1, x2, yValue, i_100xColor, line.style_solid, 1)
+    f_append(h2Array, l)
+
+if OI_delta_open_h1
+
+    yValue := f_calculateLeverage50x(kline_price, true)
+    l := f_drawLine(x1, x2, yValue, i_50xColor, line.style_dotted, 1)
+    f_append(h1Array, l)
+
+    yValue := f_calculateLeverage50x(kline_price, false)
+    l := f_drawLine(x1, x2, yValue, i_50xColor, line.style_dotted, 1)
+    f_append(h1Array, l)
+
+    yValue := f_calculateLeverage100x(kline_price, true)
+    l := f_drawLine(x1, x2, yValue, i_100xColor, line.style_dotted, 1)
+    f_append(h1Array, l)
+
+    yValue := f_calculateLeverage100x(kline_price, false)
+    l := f_drawLine(x1, x2, yValue, i_100xColor, line.style_dotted, 1)
+    f_append(h1Array, l)
+
+f_extendArray(h3Array, false)
+f_extendArray(h2Array, false)
+f_extendArray(h1Array, false)
+
+if barstate.islast and not showLine and array.size(h3Array) > 0 and array.size(h2Array) > 0 and array.size(h1Array) > 0
+    for i=0 to array.size(h3Array) - 1
+        line.delete(array.get(h3Array, i))
+
+    for i=0 to array.size(h2Array) - 1
+        line.delete(array.get(h2Array, i))
+
+    for i=0 to array.size(h1Array) - 1
+        line.delete(array.get(h1Array, i))
+
+else if barstate.islast and showLocalOnly and array.size(h3Array) > 0 and array.size(h2Array) > 0 and array.size(h1Array) > 0
+    for i=0 to array.size(h3Array) - 1
+        if line.get_y1(array.get(h3Array, i)) < rangeLow or line.get_y1(array.get(h3Array, i)) > rangeHigh
+            line.delete(array.get(h3Array, i))
+
+    for i=0 to array.size(h2Array) - 1
+        if line.get_y1(array.get(h2Array, i)) < rangeLow or line.get_y1(array.get(h2Array, i)) > rangeHigh
+            line.delete(array.get(h2Array, i))
+
+    for i=0 to array.size(h1Array) - 1
+        if line.get_y1(array.get(h1Array, i)) < rangeLow or line.get_y1(array.get(h1Array, i)) > rangeHigh
+            line.delete(array.get(h1Array, i))

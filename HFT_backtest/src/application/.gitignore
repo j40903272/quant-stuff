@@ -1,0 +1,10 @@
+.vscode/
+*.code-workspace
+*.vsix
+build/
+deploy/
+files/
+lib/
+output/
+Fitter
+src/status/Version.h

@@ -1,0 +1,23 @@
+# This workflow will install Python dependencies, run tests and lint with a single version of Python
+# For more information see: https://docs.github.com/en/actions/automating-builds-and-tests/building-and-testing-python
+
+name: test strategy output
+
+on: [push]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v2
+
+    - uses: whoan/docker-build-with-cache-action@v5
+      with:
+        username: kevinyin999
+        password: "${{ secrets.DOCKER_HUB_PASSWORD }}"
+        image_name: backtest_system_testing
+
+    - name: Run pytest
+      run: |
+        docker run backtest_system_testing pytest -s

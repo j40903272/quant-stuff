@@ -1,0 +1,87 @@
+{
+  "prepare_data_param": {
+    "er_p": 46,
+    "zscore_p": 46,
+    "resample": "15min"
+},
+  "trading_data_param": {
+    "SL_mode": "static_price",
+    "SL_pct": 0.04,
+    "TP_mode": "static_price",
+    "TP_ratio": 1.2,
+    "no_of_layer": 1
+  },
+  "target_fields": [
+      "open",
+      "high",
+      "low",
+      "close",
+      "price_delta",
+      "total_price_delta",
+      "delta_abs_sum",
+      "efficiency_ratio",
+      "efficiency_ratio_avg",
+      "efficiency_ratio_stddev",
+      "efficiency_ratio_zscore",
+      "prev_efficiency_ratio_zscore"
+  ],
+  "symbol": "ETHUSDT_UPERP",
+  "strategy_class": "EfficiencyRatioZscoreStrategy",
+  "exchange": "BINANCE",
+  "name": "00_range_tuner",
+  "short_code" : "00_range_tuner",
+  "search_param": {
+      "prepare_data_param": {
+        "er_p": [
+          75,
+          105,
+          5
+        ],
+        "zscore_p": [
+          75,
+          105,
+          5
+        ]
+      },
+      "trading_data_param": {
+        "SL_mode": [
+          "static_price"
+        ],
+        "SL_pct": [
+          0.045,
+          0.065,
+          0.005
+        ],
+        "TP_mode": [
+          "static_price"
+        ],
+        "TP_ratio": [
+          1.3
+        ],
+        "no_of_layer": [
+          1
+        ]
+      },
+      "trading_data_param_type": {
+        "SL_mode": "fixed",
+        "SL_pct": "arange",
+        "TP_mode": "fixed",
+        "TP_ratio": "list",
+        "no_of_layer": "fixed"
+      },
+      "prepare_data_param_type": {
+        "er_p": "arange",
+        "zscore_p": "arange"
+      },
+      "resample": [
+        "120min"
+      ],
+      "resample_type": "list"
+    },
+      "asset_info":{
+        "asset_class": "CRYPTO"
+      },
+      "account_info":{
+        "capital": 1000
+      }
+  }

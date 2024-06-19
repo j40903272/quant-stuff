@@ -1,0 +1,46 @@
+// This source code is subject to the terms of the Mozilla Public License 2.0 at https://mozilla.org/MPL/2.0/
+// © seanhung07
+
+min5_open = request.security('BINANCE:ETHUSDT', '5', open) 
+min5_close = request.security('BINANCE:ETHUSDT', '5', close) 
+min5_low = request.security('BINANCE:ETHUSDT', '5', low) 
+min5_high = request.security('BINANCE:ETHUSDT', '5', high) 
+
+//@version=5
+indicator('震盪過濾', overlay = false)
+lwma_length = input(25)
+weighted_close = (min5_open + min5_high + min5_close + min5_close)/4
+get_lwma(src,period, weight) =>
+    price = src
+    sub = (weight/period)-1
+    float p = na
+    float d = na
+    float sum = 0
+    float divider = 0
+    for i = 0 to period-1
+        p := price[i] * ((weight-i)-sub)
+        d := (weight-i)-sub
+        sum := sum + p
+        divider := divider + d
+    sum / divider
+
+lwma = get_lwma(weighted_close, lwma_length, 1)
+high_ma = ta.sma(min5_high,lwma_length)
+low_ma = ta.sma(min5_low, lwma_length)
+mult = input.float(2.0, minval=0, maxval=50, title="StdDev")
+dev = mult * ta.stdev(high_ma, 20)
+dev2 = mult * ta.stdev(low_ma, 20)
+// plot(lwma)
+// plot(high_ma+dev, color=color.red)
+// plot(low_ma+dev2, color=color.red)
+
+
+hist = (lwma - high_ma) 
+if math.abs(hist) < 6
+    hist := 0
+hist_color = lwma > high_ma and lwma > low_ma ? color.red : (lwma < high_ma and lwma < low_ma ? color.green : na)
+hist_y = hist_color == color.green ? math.min(hist, 0) : math.max(hist, 0)
+hist_y := -hist_y
+plot(hist_y, title="Histogram", style=plot.style_columns, color=hist_color)
+line_color = hist_y == 0 ?  color.yellow : color.white
+plot(hist_y, color=line_color)

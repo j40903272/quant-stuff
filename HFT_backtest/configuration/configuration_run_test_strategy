@@ -1,0 +1,69 @@
+{
+    "Universe": [
+        "source=BINANCE|type=PERP|pid=TRBUSDT"
+    ],
+    "MarketByOrderBook": {
+        "is_trading_through_delete": true,
+        "is_touching_on_delete": true
+    },
+    "Strategy": {
+        "CrossExchangeArbitrageStrategy": {
+            "Ensembles": [
+                {
+                    "symbol": "source=BINANCE|type=PERP|pid=TRBUSDT",
+                    "TestMaker": {
+                        "predict_symbol": "source=BINANCE|type=PERP|pid=TRBUSDT",
+                        "max_position": 100,
+                        "min_order_qty": 100,
+                        "max_order_qty": 100,
+                        "max_posialpha_thresholdtion": 100,
+                        "expired_duration": 100,
+                        "insert_cancel_duration": 100,
+                        "cancel_wait_duration": 100,
+                        "alpha_threshold": 50
+                    }
+                }
+            ],
+            "SysID": "Jb"
+        }
+    },
+    "Position": {
+        "fee_rate": 0.00002,
+        "fee_cost": 0.1
+    },
+    "MetricReporter": {
+        "interval": "00:01:00.000000000",
+        "writer_path": "/home/ubuntu/HFT_backtest/OctopusStrategy/output/metric/",
+        "writer_name": "OctopusStrategy.0000",
+        "enable_event_log": true,
+        "counter_interval": "SingleTickInterval",
+        "counter_interval_value": 0,
+        "start_time": "08:45:00:00000000",
+        "end_time": "13:45:00:00000000"
+    },
+    "Simulation": {
+        "simulation_mode": 2,
+        "forward_delay_avg": 0.000050,
+        "forward_delay_std": 0,
+        "backward_delay_avg": 0.000050,
+        "backward_delay_std": 0,
+        "peek_number_of_levels": 5,
+        "match_time": 1e-7,
+        "is_optimistic_when_filled_by_bookdiff": false,
+        "timer_mode": 0,
+        "market_impact_reset_mode": 2,
+        "numbers_of_trade_to_check": 3,
+        "possible_trades_window": 0.001
+    },
+    "MarketData": {
+        "fileroot": "/home/ubuntu/",
+        "location": "HFT_backtest"
+    },
+    "Providers": {
+        "BINANCE_PERP": {
+            "fileroot": "/home/ubuntu/",
+            "location": "HFT_backtest",
+            "filename": "b.txt"
+        }
+    }
+}

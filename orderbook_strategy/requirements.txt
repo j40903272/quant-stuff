@@ -1,0 +1,6 @@
+adjustText==1.0.4
+alive_progress==3.1.5
+matplotlib==3.7.2
+numpy==1.25.0
+pandas==2.0.3
+Requests==2.31.0

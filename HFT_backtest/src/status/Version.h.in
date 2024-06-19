@@ -1,0 +1,27 @@
+#ifndef VERSION_H
+#define VERSION_H
+
+#include <sstream>
+#include <string>
+
+#ifndef GIT_BRANCH
+#define GIT_BRANCH "@GIT_BRANCH@"
+#endif
+
+#ifndef GIT_COMMIT_DATE
+#define GIT_COMMIT_DATE "@GIT_COMMIT_DATE@"
+#endif
+
+#ifndef GIT_COMMIT_HASH
+#define GIT_COMMIT_HASH "@GIT_COMMIT_HASH@"
+#endif
+
+namespace alphaone
+{
+namespace Version
+{
+std::string GetVersionInfo();
+}
+}  // namespace alphaone
+
+#endif

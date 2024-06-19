@@ -1,0 +1,31 @@
+[package]
+name = "pluto"
+version = "0.1.0"
+edition = "2021"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+tracing = "0.1.37"
+tokio = { version = "1.36.0", features = ["full", "sync"] }
+tokio-tungstenite = { version = "*", features = ["native-tls"] }
+url = "2.5.0"
+openssl = { version = "0.10", features = ["vendored"] }
+anyhow = "1.0.80"
+serde_json = "1.0"
+serde = { version = "1.0.197", features = ["derive"] }
+reqwest = "0.11.24"
+chrono = "0.4.34"
+sha2 = "0.10.8"
+hmac = "0.12.1"
+hex = "0.4.3"
+uuid = { version = "1.7.0", features = ["v4"] }
+clap = { version = "4.5.1", features = ["derive"] }
+toml = "0.8.10"
+base64 = "0.22.0"
+meansd = "2.1.0"
+futures = "0.3.30"
+dotenv = "0.15.0"
+serde_tuple = "0.5.0"
+flate2 = "1.0.30"
+warp = "0.3.7"

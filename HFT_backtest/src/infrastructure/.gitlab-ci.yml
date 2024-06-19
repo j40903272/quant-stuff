@@ -1,0 +1,10 @@
+image: gcc
+
+stages:
+  - Lint
+
+Lint:
+  stage: Lint
+  script:
+    - bash Linter.sh
+

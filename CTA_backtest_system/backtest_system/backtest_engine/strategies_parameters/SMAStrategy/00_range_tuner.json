@@ -1,0 +1,77 @@
+{
+    "prepare_data_param": {
+      "fast_sma_period": 9,
+      "slow_sma_period": 20,
+      "resample": "15min"
+  },
+    "trading_data_param": {
+      "SL_mode": "static_price",
+      "SL_pct": 0.03,
+      "TP_mode": "static_price",
+      "TP_ratio": 1.5,
+      "no_of_layer": 1
+  },
+  "target_fields": [
+      "open",
+      "high",
+      "low",
+      "close",
+      "slow_sma",
+      "fast_sma",
+      "prev_slow_sma",
+      "prev_fast_sma"
+  ],
+  "symbol": "ETHUSDT_UPERP",
+  "strategy_class": "SMAStrategy",
+  "exchange": "BINANCE",
+  "name": "00_range_tuner",
+  "short_code" : "00_range_tuner",
+  "search_param": {
+      "prepare_data_param": {
+        "fast_sma_period": [
+          5,
+          10,
+          1
+        ],
+        "slow_sma_period": [
+          10,
+          20,
+          1
+        ]
+      },
+      "trading_data_param": {
+        "SL_mode": [
+          "static_price"
+        ],
+        "SL_pct": [
+          0.03,
+          0.04
+        ],
+        "TP_mode": [
+          "static_price"
+        ],
+        "TP_ratio": [
+          1.0,
+          1.5
+        ],
+        "no_of_layer": [
+          1
+        ]
+      },
+      "prepare_data_param_type": {
+        "fast_sma_period": "arange",
+        "slow_sma_period": "arange"
+      },
+      "trading_data_param_type": {
+        "SL_mode": "fixed",
+        "SL_pct": "arange",
+        "TP_mode": "fixed",
+        "TP_ratio": "list",
+        "no_of_layer": "fixed"
+      },
+      "resample": [
+        "15min"
+      ],
+      "resample_type": "list"
+    }
+}

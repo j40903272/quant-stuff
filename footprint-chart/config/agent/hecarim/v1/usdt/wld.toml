@@ -1,0 +1,17 @@
+type = "HecarimV1"
+
+[params.config]
+uuid = "demobot"
+amount = 2.0
+min_tick_precision = 4
+symbol = "BINANCE-P:WLD-USDT"
+imbalance_limit = 8000.0
+delta_limit = 13000.0
+bin_tick_precision = 3
+tp_tick = 60
+sl_tick = 20
+
+[params.var]
+previous_footprints = []
+orders = []
+positions = []

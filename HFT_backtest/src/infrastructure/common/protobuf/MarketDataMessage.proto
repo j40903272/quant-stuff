@@ -1,0 +1,144 @@
+syntax = "proto3";
+
+import "google/protobuf/wrappers.proto";
+
+package protobuf;
+
+message MarketDataMessage{
+
+    enum MarketDataMessageType
+    {
+        MarketDataMessageType_Invalid         = 0;
+        MarketDataMessageType_Snapshot        = 1;
+        MarketDataMessageType_Add             = 2;
+        MarketDataMessageType_Delete          = 3;
+        MarketDataMessageType_ModifyWithPrice = 4;
+        MarketDataMessageType_ModifyWithQty   = 5;
+        MarketDataMessageType_Trade           = 6;
+        MarketDataMessageType_PacketEnd       = 7;
+        MarketDataMessageType_Implied         = 8;
+        MarketDataMessageType_TPrice          = 9;
+        MarketDataMessageType_TPrice_R02     = 10;
+    }
+
+    enum CalculatedFlag
+    {
+        Normal    = 0;
+        PreMarket = 1;
+    }
+
+    oneof message {
+        MarketDataMessage_MBP MBP= 1;
+        MarketDataMessage_MBO MBO= 2;
+        MarketDataMessage_TRADE TRADE= 3;
+        MarketDataMessage_IMPLIED IMPLIED= 9;
+        MarketDataMessage_TPRICE TPrice= 10;
+        MarketDataMessage_TMPR02_t R02= 11;
+    }
+
+    MarketDataMessageType MessageType = 4;
+    string Pid = 5;
+    int64 ProviderTime = 6;
+    int64 ExchangeTime = 7;
+    int64 SequenceNumber = 8;
+    CalculatedFlag Calculatedflag = 12;
+   
+}
+
+message MarketDataMessage_MBP{
+    int32    Count = 1;
+    repeated int64 Bid = 2;
+    repeated int64 Ask = 3;
+    repeated int64 BidQty = 4;
+    repeated int64 AskQty = 5;
+    google.protobuf.BoolValue IsPacketEnd = 6;
+}
+
+message MarketDataMessage_MBO{
+    int64   OrderID = 1;
+    int64   Price = 2;
+    int64   Qty = 3;
+    int32   Level = 4;
+    int32   Side = 5;
+    int32   NumberOfOrders = 6;
+    google.protobuf.BoolValue IsPacketEnd = 7;
+}
+
+message MarketDataMessage_TRADE{
+    int64   OrderID = 1;
+    int64   Price = 2;
+    int64   Qty = 3;
+    int32   Side = 4;
+    int64   CounterpartyOrderID = 5;
+    google.protobuf.BoolValue IsPacketEnd = 6;
+}
+
+message MarketDataMessage_IMPLIED{
+    int32    Count = 1;
+    repeated int64 Bid = 2;
+    repeated int64 Ask = 3;
+    repeated int64 BidQty = 4;
+    repeated int64 AskQty = 5;
+    google.protobuf.BoolValue IsPacketEnd = 6;
+}
+
+message MarketDataMessage_TPRICE{
+    int64 Price = 1;
+    int64 BSCode = 2;
+    int64 Type = 3;
+    google.protobuf.BoolValue IsPacketEnd = 4;
+}
+
+message TMPMsgTime_t{
+    int32 epoch_s = 1;
+    uint32 ms = 2;
+}
+
+message TMPHdr_t{
+    uint32 msg_length = 1;
+    uint32 MsgSeqNum = 2;
+    TMPMsgTime_t msg_time = 3;
+    uint32 MessageType = 4;
+    uint32 fcm_id = 5;
+    uint32 session_id = 6;
+}
+
+message MarketDataMessage_TMPR02_t{
+    TMPHdr_t hdr = 1;
+    uint32 status_code = 2;
+    int32 ExecType = 3;
+    uint32 cm_id = 4;
+    uint32 fcm_id = 5;
+    string order_no = 6;
+    uint32 ord_id = 7;
+    string user_define = 8;
+    uint32 symbol_type = 9;
+    string sym = 10;
+    int32 Price = 11;
+    uint32 qty = 12;
+    uint32 investor_acno = 13;
+    int32 investor_flag = 14;
+    uint32 Side = 15;
+    uint32 OrdType = 16;
+    uint32 TimeInForce = 17;
+    int32 PositionEffect = 18;
+    int32 LastPx = 19;
+    uint32 LastQty = 20;
+    int64 px_subtotal = 21;
+    uint32 CumQty = 22;
+    uint32 LeavesQty = 23;
+    uint32 before_qty = 24;
+    uint32 leg_side_1 = 25;
+    uint32 leg_side_2 = 26;
+    int32 leg_px_1 = 27;
+    int32 leg_px_2 = 28;
+    uint32 leg_qty_1 = 29;
+    uint32 leg_qty_2 = 30;
+    TMPMsgTime_t org_trans_time = 31;
+    TMPMsgTime_t TransactTime = 32;
+    uint32 target_id = 33;
+    uint32 uniq_id = 34;
+    uint32 rpt_seq = 35;
+    uint32 protocol_type = 36;
+    uint32 CheckSum = 37;
+}

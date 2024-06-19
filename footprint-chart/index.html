@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html style="height: 100%">
+  <head>
+    <meta charset="UTF-8" />
+    <title>eCharts Custom Series Example</title>
+    <script src="https://cdn.jsdelivr.net/npm/echarts/dist/echarts.min.js"></script>
+  </head>
+  <body style="height: 100%; margin: 0">
+    <div id="main" style="width: 100%; height: 100%"></div>
+    <script type="text/javascript">
+      var chart = echarts.init(document.getElementById('main'))
+      var raw_datas = []
+
+      const ws = new WebSocket('ws://127.0.0.1:3030/ws')
+
+      ws.onopen = function (event) {
+        // console.log('WebSocket is connected.')
+      }
+
+      ws.onmessage = function (event) {
+        raw_datas = [...raw_datas, JSON.parse(event.data)]
+        console.log('now datas length: ', raw_datas.length)
+
+        let datas = raw_datas.slice(-10000)
+        datas.forEach(event => {
+          const date = new Date(event.timestamp_ms)
+          const formattedDate = `${date.getFullYear()}/${(date.getMonth() + 1)
+            .toString()
+            .padStart(2, '0')}/${date
+            .getDate()
+            .toString()
+            .padStart(2, '0')} ${date
+            .getHours()
+            .toString()
+            .padStart(2, '0')}:${date.getMinutes().toString().padStart(2, '0')}`
+          event.x = formattedDate
+          event.y = event.price.toFixed(3)
+        })
+
+        // 分组和求和操作
+        let overall_max_qty = 0
+        const groupedData = {}
+        datas.forEach(event => {
+          const key = `${event.x}|${event.y}|${event.is_buyer_maker}`
+          if (!groupedData[key]) {
+            groupedData[key] = {
+              x: event.x,
+              y: event.y,
+              is_buyer_maker: event.is_buyer_maker,
+              qty: 0
+            }
+          }
+          groupedData[key].qty += event.qty
+          overall_max_qty = Math.max(overall_max_qty, groupedData[key].qty)
+        })
+
+        // 格式化输出结果
+        const result = Object.values(groupedData).map(item => [
+          item.x,
+          (parseFloat(item.y) - 0.0001 * 5).toFixed(4),
+          (parseFloat(item.y) + 0.0001 * 5).toFixed(4),
+          // long
+          item.is_buyer_maker ? 0 : item.qty,
+          item.is_buyer_maker ? 0 : item.qty / overall_max_qty,
+          // short
+          item.is_buyer_maker ? item.qty : 0,
+          item.is_buyer_maker ? item.qty / overall_max_qty : 0
+        ])
+
+        // 输出结果
+        // console.log(result)
+
+        var option = {
+          xAxis: {
+            type: 'category',
+            data: [...new Set(result.map(x => x[0]))].slice(-7)
+          },
+          yAxis: [
+            {
+              type: 'value',
+              name: 'Price',
+              // min: 'dataMin',
+              // max: 'dataMax'
+              max: Math.max(...result.map(x => x[2])) + 0.001, // max:
+              min: Math.min(...result.map(x => x[1])) - 0.001 // min:
+            },
+            {
+              type: 'value',
+              name: 'Volume',
+              position: 'right'
+            }
+          ],
+          series: [
+            {
+              type: 'custom',
+              renderItem: function (params, api) {
+                var categoryIndex = api.value(0)
+                var open = api.value(1)
+                var high = api.value(2)
+                var low = api.value(3)
+                var close = api.value(4)
+
+                var startPoint = api.coord([categoryIndex, open])
+                var endPoint = api.coord([categoryIndex, close])
+                var highPoint = api.coord([categoryIndex, high])
+                var lowPoint = api.coord([categoryIndex, low])
+
+                var barWidth = api.size([1, 0])[0] * 0.2 // 60% of category width
+
+                var rectShape = {
+                  x: startPoint[0] - barWidth / 2,
+                  y: Math.min(startPoint[1], endPoint[1]),
+                  width: barWidth,
+                  height: Math.abs(startPoint[1] - endPoint[1])
+                }
+
+                var color = close > open ? 'green' : 'red'
+
+                return {
+                  type: 'group',
+                  children: [
+                    {
+                      type: 'line',
+                      shape: {
+                        x1: highPoint[0],
+                        y1: highPoint[1],
+                        x2: lowPoint[0],
+                        y2: lowPoint[1]
+                      },
+                      style: {
+                        stroke: color,
+                        lineWidth: 1.5
+                      }
+                    },
+                    {
+                      type: 'rect',
+                      shape: rectShape,
+                      style: {
+                        fill: color
+                      }
+                    }
+                  ]
+                }
+              },
+              encode: {
+                x: 0,
+                y: [1, 2, 3, 4]
+              },
+              data: [
+                //   ['2024/05/09 14:25', 5.3812, 5.3835, 5.3805, 5.3825]
+                //   ['A', 100, 200, 80, 150],
+                //   ['B', 120, 220, 90, 180],
+                //   ['C', 90, 150, 30, 100],
+                //   ['D', 150, 300, 120, 280]
+              ]
+            },
+            {
+              type: 'custom',
+              name: 'Volume',
+              renderItem: function (params, api) {
+                var categoryIndex = api.value(0)
+                var open = api.value(1)
+                var high = api.value(2)
+                var low = api.value(3)
+                var close = api.value(4)
+
+                var bot_val = api.value(1)
+                var botPoint = api.coord([categoryIndex, bot_val])
+                var top_val = api.value(2)
+                var topPoint = api.coord([categoryIndex, top_val])
+                var left_val = api.value(3)
+                var left_pct = api.value(4)
+                var right_val = api.value(5)
+                var right_pct = api.value(6)
+
+                var barWidth = api.size([1, 0])[0] * 0.3 // 60% of category width
+
+                var leftBarWidth = api.size([1, 0])[0] * 0.48 * left_pct
+                var rightBarWidth = api.size([1, 0])[0] * 0.48 * right_pct
+
+                return {
+                  type: 'group',
+                  children: [
+                    {
+                      type: 'rect',
+                      shape: {
+                        x: botPoint[0] - leftBarWidth,
+                        y: Math.min(botPoint[1], topPoint[1]),
+                        width: leftBarWidth,
+                        height: Math.abs(botPoint[1] - topPoint[1])
+                      },
+                      style: {
+                        fill: 'rgba(0, 255, 0, 0.5)',
+                        stroke: 'rgba(128, 128, 128, 0.3)',
+                        lineWidth: 2,
+                        lineDash: [5, 5]
+                      }
+                    },
+                    {
+                      type: 'rect',
+                      shape: {
+                        x: botPoint[0],
+                        y: Math.min(botPoint[1], topPoint[1]),
+                        width: rightBarWidth,
+                        height: Math.abs(botPoint[1] - topPoint[1])
+                      },
+                      style: {
+                        fill: 'rgba(255, 0, 0, 0.5)',
+                        stroke: 'rgba(128, 128, 128, 0.3)', // 设置边框颜色和透明度
+                        lineWidth: 2, // 设置边框宽度
+                        lineDash: [5, 5] //
+                      }
+                    }
+                  ]
+                }
+              },
+              encode: {
+                x: 0,
+                y: [1, 2, 3, 4, 5, 6]
+              },
+              data: result
+            }
+          ]
+        }
+        // 假设第一个 y 轴是价格轴
+        var priceAxis = option.yAxis[0]
+
+        // 使用第一个 y 轴的最小值和最大值来设置价格轴的范围
+        option.yAxis.forEach(function (axis, index) {
+          if (index !== 0) return // 只处理第一个 y 轴
+          axis.min = priceAxis.min
+          axis.max = priceAxis.max
+        })
+        chart.setOption(option)
+      }
+
+      ws.onerror = function (event) {
+        // alert('WebSocket error. Please check the console.')
+        console.error('WebSocket error:', event)
+      }
+
+      ws.onclose = function (event) {
+        // alert('WebSocket is closed. Please check the console.')
+        console.log('WebSocket is closed now.')
+      }
+    </script>
+  </body>
+</html>

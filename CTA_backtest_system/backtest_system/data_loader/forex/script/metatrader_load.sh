@@ -1,0 +1,1 @@
+python3 /Users/chouwilliam/backtest_system/data_loader/forex/fx_loader.py --platform META_TRADER

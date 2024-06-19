@@ -1,0 +1,16 @@
+{
+    "api_key_path": "./api_key.ini",
+    "symbol": "XRP",
+    "position_size_usdt": 10,
+    "want_to_earn": 0.003,
+    "exchanges": {
+        "binance": {
+            "maker_cost": 0,
+            "taker_cost": 0.000153
+        },
+        "bingx": {
+            "maker_cost": 0.0000045,
+            "taker_cost": 0.000105
+        }
+    }
+}

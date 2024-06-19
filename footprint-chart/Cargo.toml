@@ -1,0 +1,11 @@
+[workspace]
+resolver = "2"
+
+members = [
+    # main app
+    "footprint",
+
+    # libraries
+    "crates/logger",
+    "crates/pluto",
+]

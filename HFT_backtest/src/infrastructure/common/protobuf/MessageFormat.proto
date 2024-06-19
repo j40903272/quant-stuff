@@ -1,0 +1,129 @@
+syntax = "proto3";
+package MessageFormat;
+
+
+enum ENUM_ActionType {
+    Broadcast = 0;
+	Request = 1;
+}
+
+
+ 
+message GenericMessage {
+ ENUM_ActionType ActionType = 1;
+ oneof message {
+	MsgDataStruct    MsgData = 2;
+	OrderStruct	     OrderData = 3;
+	ReportStruct     ReportData = 4;
+	MatchStruct      MatchData = 5;
+ }
+}
+
+message MsgDataStruct{
+  string Action = 1;
+  map<string, string> StringMap = 2;
+  map<string, int64> Int64Map = 3;
+  map<string, double> DoubleMap = 4;
+}
+
+message ReportStruct{
+string UniID = 1;
+string ClOrdID = 2;
+string SrcIP = 3;
+string UserDef = 4;
+string BrokerID = 5;
+string Account = 6;
+string SubAcc = 7;
+string Side = 8;
+string SecurityType = 9;
+string Fcode = 10;
+string Symbol = 11;
+string SegMkt = 12;
+string OrgPrice1 = 13;
+string OrgPrice2 = 14;
+string OrgQty1 = 15;
+string OrgQty2 = 16;
+string OrdNo = 17;
+string Price1 = 18;
+string OrdType = 19;
+string TimeInForce = 20;
+string OpenOff = 21;
+string LeavesQty1 = 22;
+string LeavesQty2 = 23;
+string CumQty1 = 24;
+string CumQty2 = 25;
+string TradeDate = 26;
+string TransactTime = 27;
+string OrdStatus = 28;
+string Msg = 29;
+string IsRecovered = 30;
+string FcmID_SessionID = 31;
+string ScForce = 32;
+string ExchangeCode = 33;
+string OrderChannel = 34;
+string OrdTime = 35;
+}
+
+message MatchStruct{
+string UniID = 1;
+string ClOrdID = 2;
+string SrcIP = 3;
+string UserDef = 4;
+string BrokerID = 5;
+string Account = 6;
+string SubAcc = 7;
+string Side = 8;
+string SecurityType = 9;
+string Symbol = 10;
+string SegMkt = 11;
+string OrgPrice = 12;
+string OrgQty = 13;
+string OrdNo = 14;
+string OrdType = 15;
+string TimeInForce = 16;
+string OpenOff = 17;
+string LeavesQty = 18;
+string CumQty1 = 19;
+string CumQty2 = 20;
+string TradeDate = 21;
+string TransactTime = 22;
+string OrdStatus = 23;
+string Msg = 24;
+string IsRecovered = 25;
+string FcmID_SessionID = 26;
+string DealUniKey = 27;
+string DealPrice = 28;
+string DealQty = 29;
+string DealPriceLeg1 = 30;
+string DealPriceLeg2 = 31;
+string ScForce = 32;
+string ExchangeCode = 33;
+string OrderChannel = 34;
+string OrdTime = 35;
+}
+
+message OrderStruct{
+string UniID = 1;
+string ClOrdID = 2;
+string UserDef = 3;
+string BrokerID = 4;
+string Account = 5;
+string SubAcc = 6;
+string Side = 7;
+string SecurityType = 8;
+string Fcode = 9;
+string Symbol = 10;
+string SegMkt = 11;
+string Price1 = 12;
+string Price2 = 13;
+string Qty1 = 14;
+string Qty2 = 15;
+string OrdNo = 16;
+string OrdType = 17;
+string TimeInForce = 18;
+string OpenOff = 19;
+string ScForce = 20;
+int32  IsReserved = 21;
+string ReserveCondition = 22;
+int32  ExchID = 23;
+}

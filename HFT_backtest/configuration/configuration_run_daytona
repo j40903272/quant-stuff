@@ -1,0 +1,104 @@
+{
+    "Universe": [
+        "source=TSE|type=SECURITY|pid=2330",
+        "source=TSE|type=SECURITY|pid=2317",
+        "source=TAIFEX|type=FUTURE|cpid=TXFC1"
+    ],
+    "AlphaTree": {
+        "caching_on": false
+    },
+    "Strategy": {
+        "DaytonaStrategy": {
+            "Ensembles": [
+                {
+                    "Daytona": {
+                        "fit_tag": "2330.2022.10.18.15.31.15.0",
+                        "fit_outcome": "Snapshot_MessageInterval_2330_50-Signal_ForwardMidReturn_2330_SingleTickInterval_2330_5",
+                        "fit_weight": 1.0,
+                        "hedge_wide_tick": 0.0,
+                        "cancel_wide_tick": 0.2,
+                        "cancel_wait_duration": 0.2,
+                        "expired_duration": 10.0
+                    },
+                    "symbol": "source=TSE|type=SECURITY|pid=2330"
+                },
+                {
+                    "Daytona": {
+                        "fit_tag": "2317.2022.10.18.15.31.58.0",
+                        "fit_outcome": "Snapshot_MessageInterval_2317_50-Signal_ForwardMidReturn_2317_SingleTickInterval_2317_5",
+                        "fit_weight": 1.0,
+                        "hedge_wide_tick": 0.0,
+                        "cancel_wide_tick": 0.2,
+                        "cancel_wait_duration": 0.2,
+                        "expired_duration": 10.0
+                    },
+                    "symbol": "source=TSE|type=SECURITY|pid=2317"
+                }
+            ],
+            "future": "source=TAIFEX|type=FUTURE|cpid=TXFC1",
+            "max_position": 100,
+            "max_exposure": 30,
+            "base_index": 13081.24,
+            "base_market_cap": 40501778786990,
+            "basis": -0.5522,
+            "dynamic_shift_coef_sell": 0,
+            "dynamic_shift_coef_buy": 0,
+            "basis_threshold_sell": 0.002,
+            "basis_threshold_buy": -0.004,
+            "is_etf": false,
+            "holding_shares": 2100500000,
+            "show_trigger": true
+        }
+    },
+    "Position": {
+        "Stock": {
+            "fee_rate": 5.2e-05,
+            "tax_rate": 0.0015,
+            "fee_cost": 0.0
+        },
+        "Future": {
+            "fee_rate": 2e-05,
+            "tax_rate": 0.0,
+            "fee_cost": 0.0025
+        }
+    },
+    "MarketData": {
+        "fileroot": "/home/ubuntu/",
+        "location": "HFT_backtest"
+    },
+    "Providers": {
+        "AlphaOne": {
+            "fileroot": "/home/ubuntu/",
+            "location": "HFT_backtest",
+            "filename": "a.txt"
+        }
+    },
+    "System": {
+        "stock_userdefine": "362 Ja",
+        "future_userdefine": "2004Ja"
+    },
+    "Simulation": {
+        "simulation_mode": "FilledByBookDiffAndTrade",
+        "passive_forward_delay_avg": 0.0008,
+        "aggressive_forward_delay_avg": 0.0008,
+        "passive_backward_delay_avg": 0.0002,
+        "aggressive_backward_delay_avg": 0.0002,
+        "rod_report_delay_avg": 0.0001,
+        "peek_number_of_levels": 5,
+        "match_time": 2e-05,
+        "is_optimistic_when_filled_by_bookdiff": false,
+        "timer_mode": "PacketEnd",
+        "market_impact_reset_mode": 2,
+        "numbers_of_trade_to_check": 5,
+        "order_shift": 0.001,
+        "possible_trades_window": 0.002
+    },
+    "MarketByOrderBook": {
+        "is_trading_through_delete": false,
+        "is_touching_on_delete": false
+    },
+    "ReferenceData": {
+        "retrieving_days": 30
+    },
+    "SharesReader": {}
+}

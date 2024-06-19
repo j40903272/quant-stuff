@@ -1,0 +1,119 @@
+#include "TaifexOrderStatus.h"
+
+namespace alphaone
+{
+
+std::string TaifexErrorStatusToString(const TaifexErrorStatus &status)
+{
+    switch (status)
+    {
+    case TaifexErrorStatus::SUCCESS:
+        return "SUCCESS";
+    case TaifexErrorStatus::TRADING_TIME_OVER:
+        return "TRADING_TIME_OVER";
+    case TaifexErrorStatus::NOT_START_RECEIVING_ORDER:
+        return "NOT_START_RECEIVING_ORDER";
+    case TaifexErrorStatus::NOT_START_RECEIVING_QUOTE:
+        return "NOT_START_RECEIVING_QUOTE";
+    case TaifexErrorStatus::PROCESSING:
+        return "PROCESSING";
+    case TaifexErrorStatus::ORDER_NO_NOT_FOUND:
+        return "ORDER_NO_NOT_FOUND";
+    case TaifexErrorStatus::IS_FULLY_FILLED:
+        return "IS_FULLY_FILLED";
+    case TaifexErrorStatus::ALREADY_CANCELLED:
+        return "ALREADY_CANCELLED";
+    case TaifexErrorStatus::STOP_NEW_ORDER:
+        return "STOP_NEW_ORDER";
+    case TaifexErrorStatus::CLOSE_ORDER_ONLY:
+        return "CLOSE_ORDER_ONLY";
+    case TaifexErrorStatus::ORDER_NO_LONGER_IN_BOOK:
+        return "ORDER_NO_LONGER_IN_BOOK";
+    case TaifexErrorStatus::INVALID_EXECTYPE:
+        return "INVALID_EXECTYPE";
+    case TaifexErrorStatus::INVALID_FUTURE_ID:
+        return "INVALID_FUTURE_ID";
+    case TaifexErrorStatus::INVALID_BRANCH_ID:
+        return "INVALID_BRANCH_ID";
+    case TaifexErrorStatus::INVALID_ACCOUNT:
+        return "INVALID_ACCOUNT";
+    case TaifexErrorStatus::INVALID_INVESTER_NO:
+        return "INVALID_INVESTER_NO";
+    case TaifexErrorStatus::NO_CANCEL_MODIFY_PERIOD:
+        return "NO_CANCEL_MODIFY_PERIOD";
+    case TaifexErrorStatus::DUPLICATE_ORDER_NO:
+        return "DUPLICATE_ORDER_NO";
+    case TaifexErrorStatus::INVALID_ORDER_NO:
+        return "INVALID_ORDER_NO";
+    case TaifexErrorStatus::NO_SAME_SIDE_LIMIT_ORDER:
+        return "NO_SAME_SIDE_LIMIT_ORDER";
+    case TaifexErrorStatus::INVALID_PID:
+        return "INVALID_PID";
+    case TaifexErrorStatus::PRICE_OVER_LIMIT:
+        return "PRICE_OVER_LIMIT";
+    case TaifexErrorStatus::INVALID_QTY:
+        return "INVALID_QTY";
+    case TaifexErrorStatus::INVALID_SIDE:
+        return "INVALID_SIDE";
+    case TaifexErrorStatus::INVALID_QRDTYPE:
+        return "INVALID_QRDTYPE";
+    case TaifexErrorStatus::ORDTYPE_PRICE_NOT_MATCH:
+        return "ORDTYPE_PRICE_NOT_MATCH";
+    case TaifexErrorStatus::INVALID_TIMEINFORCE:
+        return "INVALID_TIMEINFORCE";
+    case TaifexErrorStatus::INVALID_POSITIONEFFECT:
+        return "INVALID_POSITIONEFFECT";
+    case TaifexErrorStatus::INVALID_PRICE_TICK:
+        return "INVALID_PRICE_TICK";
+    case TaifexErrorStatus::EXPIRED_PRODUCT:
+        return "EXPIRED_PRODUCT";
+    case TaifexErrorStatus::FUTURE_ID_TYPE_ACNO_MISS:
+        return "FUTURE_ID_TYPE_ACNO_MISS";
+    case TaifexErrorStatus::MODIFY_QTY_LARGER:
+        return "MODIFY_QTY_LARGER";
+    case TaifexErrorStatus::OVER_QUOTAION_SPREAD:
+        return "OVER_QUOTAION_SPREAD";
+    case TaifexErrorStatus::BID_OVER_ASK:
+        return "BID_OVER_ASK";
+    case TaifexErrorStatus::QUOTE_MODIFY_QTY_ZERO:
+        return "QUOTE_MODIFY_QTY_ZERO";
+    case TaifexErrorStatus::QUOTE_QTY_BELOW_LIMIT:
+        return "QUOTE_QTY_BELOW_LIMIT";
+    case TaifexErrorStatus::MARKET_ORDER_NOT_ALLOWED:
+        return "MARKET_ORDER_NOT_ALLOWED";
+    case TaifexErrorStatus::QUOTE_MODIFY_PRICE_WRONG:
+        return "QUOTE_MODIFY_PRICE_WRONG";
+    case TaifexErrorStatus::PRICE_OVER_DYNAMIC_RANGE:
+        return "PRICE_OVER_DYNAMIC_RANGE";
+    case TaifexErrorStatus::PRICE_OVER_DYNAMIC_LIMIT:
+        return "PRICE_OVER_DYNAMIC_LIMIT";
+    case TaifexErrorStatus::FOK_NOT_FILLED:
+        return "FOK_NOT_FILLED";
+    case TaifexErrorStatus::IOC_PARTIALLY_FILLED:
+        return "IOC_PARTIALLY_FILLED";
+    case TaifexErrorStatus::IOC_NOT_FILLED:
+        return "IOC_NOT_FILLED";
+    case TaifexErrorStatus::CANCEL_REDUCE_SIDE_WRONG:
+        return "CANCEL_REDUCE_SIDE_WRONG";
+    case TaifexErrorStatus::CANCEL_REDUCE_PROD_WRONG:
+        return "CANCEL_REDUCE_PROD_WRONG";
+    case TaifexErrorStatus::IOC_CANNOT_MODIFY:
+        return "IOC_CANNOT_MODIFY";
+    case TaifexErrorStatus::KILL_SWITCH_ON:
+        return "KILL_SWITCH_ON";
+    case TaifexErrorStatus::INVALID_CONTRACT:
+        return "INVALID_CONTRACT";
+    case TaifexErrorStatus::SESSION_OVER_PVC_LIMIT:
+        return "SESSION_OVER_PVC_LIMIT";
+    case TaifexErrorStatus::SESSION_STOP_DUE_TO_OVER:
+        return "SESSION_STOP_DUE_TO_OVER";
+    case TaifexErrorStatus::SESSION_PVC_OVER_80:
+        return "SESSION_PVC_OVER_80";
+    case TaifexErrorStatus::SESSION_PVC_OVER_90:
+        return "SESSION_PVC_OVER_90";
+    default:
+        return "OTHER_ERROR";
+    }
+}
+
+}  // namespace alphaone

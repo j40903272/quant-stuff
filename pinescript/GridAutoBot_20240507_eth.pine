@@ -1,0 +1,189 @@
+//@version=5
+// This source code is subject to the terms of the Mozilla Public License 2.0 https://mozilla.org/MPL/2.0/
+// ©mvs1231 || xxattaxx
+indicator('Grid Bot Auto', shorttitle='GridBotAuto', overlay=true)
+//----<User Inputs>------------------------------------------------------------------------------//
+iLen = input.int(7, 'Smoothing Length(7)', minval=1)
+iMA = input.string('lreg', 'Smoothing Type', options=['lreg', 'sma', 'ema', 'vwma', 'tema'])
+iLZ = input.float(4.0, 'Laziness(4%)', step=.25) / 100
+iELSTX = input(50.0, 'Elasticity(50)')
+iGI = input.float(2.0, 'Grid Interval(2%)', step=.25) / 100
+iGrids = input.int(6, 'Number of Grids', options=[2, 4, 6, 8])
+iCool = input.int(2, 'Cooldown(2)', minval=0)
+iDir = input.string('neutral', 'Direction', options=['neutral', 'up', 'down'])
+iGT = input.int(70, 'Grid Line Transparency(100 to hide)', minval=0, maxval=100)
+iFT = input.int(90, 'Fill Transparency(100 to hide)', minval=0, maxval=100)
+iSS = input.string('small', 'Signal Size', options=['small', 'large'])
+iReset = input(true, 'Reset Buy/Sell Index When Grids Change')
+iEXTR = input(true, 'Use Highs/Lows for Signals')
+iMT = input(true, 'Show Min Tick')
+iRFC = input(false, 'Reverse Fill Colors')
+//----<Colors>-----------------------------------------------------------------------------------//
+RedGrid = color.new(color.red, iGT)
+GreenGrid = color.new(color.green, iGT)
+Crimson = #DC143C
+LimeGreen = #32CD32
+//----<Variables>--------------------------------------------------------------------------------//
+NextUP = 0.0
+NextDN = 0.0
+LastSignal = 0
+LastSignal_Index = 0
+AP = 0.0
+G = iGrids
+Buy = false
+Sell = false
+UpperLimit = 0.0
+LowerLimit = 0.0
+SignalLine = 0.0
+CurrentGrid = 0.0
+BuyLine = 0.0
+SellLine = 0.0
+DIR = 0
+MeaningOfLife = 42
+//----<Calculations>-----------------------------------------------------------------------------//
+//Lazy Formula
+lz(x, lzf) =>
+    LZ = 0.0
+    s = math.sign(x)
+    LZ := x == nz(x[1], x) ? x : x > nz(LZ[1] + lzf * LZ[1] * s, x) ? x : x < nz(LZ[1] - lzf * LZ[1] * s, x) ? x : LZ[1]
+    LZ
+//Smoothing
+LR = ta.linreg(close, iLen, 0)
+SMA = ta.sma(close, iLen)
+EMA = ta.ema(close, iLen)
+VWMA = ta.vwma(close, iLen)
+TEMA = ta.ema(ta.ema(ta.ema(close, iLen), iLen), iLen)
+MA = iMA == 'lreg' ? LR : iMA == 'sma' ? SMA : iMA == 'ema' ? EMA : iMA == 'vwma' ? VWMA : TEMA
+//Make Lazy
+LMA = lz(MA, iLZ)
+//Calculate Elasticity
+ELSTX = syminfo.mintick * iELSTX
+//Show Mintick
+if iMT and barstate.islast
+    table.cell(table.new(position.top_right, 1, 1), 0, 0, str.tostring(syminfo.mintick))
+//Anchor Point
+AP := MA > LMA ? AP[1] + ELSTX : MA < LMA ? AP[1] - ELSTX : AP[1]
+AP := AP >= NextUP[1] ? NextUP[1] : AP
+AP := AP <= NextDN[1] ? NextDN[1] : AP
+//Reset if Next Level Reached or AP is crossed
+AP := LMA != LMA[1] ? LMA : AP
+//Next Gridlines
+NextUP := LMA != LMA[1] ? LMA + LMA * iGI : NextUP[1]
+NextDN := LMA != LMA[1] ? LMA - LMA * iGI : NextDN[1]
+//Grid Interval
+GI = AP * iGI
+//----<Grid Array>-------------------------------------------------------------------------------//
+a_grid = array.new_float(9)
+for x = -4 to 4 by 1
+    array.set(a_grid, x + 4, AP + GI * x)
+Get_Array_Values(ArrayName, index) =>
+    value = array.get(ArrayName, index)
+    value
+//----<Set Static Grids>-------------------------------------------------------------------------//
+G0 = Get_Array_Values(a_grid, 0)  //Upper4
+G1 = Get_Array_Values(a_grid, 1)  //Upper3
+G2 = Get_Array_Values(a_grid, 2)  //Upper2
+G3 = Get_Array_Values(a_grid, 3)  //Upper1
+G4 = Get_Array_Values(a_grid, 4)  //Center
+G5 = Get_Array_Values(a_grid, 5)  //Lower1
+G6 = Get_Array_Values(a_grid, 6)  //Lower2
+G7 = Get_Array_Values(a_grid, 7)  //Lower3
+G8 = Get_Array_Values(a_grid, 8)  //Lower4
+//----<Set Upper and Lower Limits>---------------------------------------------------------------//
+UpperLimit := G >= 8 ? G8 : G >= 6 ? G7 : G >= 4 ? G6 : G5
+LowerLimit := G >= 8 ? G0 : G >= 6 ? G1 : G >= 4 ? G2 : G3
+//----<Calculate Signals>------------------------------------------------------------------------//
+Get_Signal_Index() =>
+    Value = 0.0
+    Buy_Index = 0
+    Sell_Index = 0
+    start = 4 - G / 2
+    end = 4 + G / 2
+    for x = start to end by 1
+        Value := Get_Array_Values(a_grid, x)
+        if iEXTR
+            Sell_Index := low[1] < Value and high >= Value ? x : Sell_Index
+            Buy_Index := high[1] > Value and low <= Value ? x : Buy_Index
+            Buy_Index
+        else
+            Sell_Index := close[1] < Value and close >= Value ? x : Sell_Index
+            Buy_Index := close[1] > Value and close <= Value ? x : Buy_Index
+            Buy_Index
+    [Buy_Index, Sell_Index]
+[BuyLine_Index, SellLine_Index] = Get_Signal_Index()
+//----<Signals>----------------------------------------------------------------------------------//
+Buy := BuyLine_Index > 0 ? true : Buy
+Sell := SellLine_Index > 0 ? true : Sell
+//No repeat trades at current level                                                                                     
+Buy := low >= SignalLine[1] - GI ? false : Buy
+Sell := high <= SignalLine[1] + GI ? false : Sell
+//No trades outside of grid limits
+Buy := close > UpperLimit ? false : Buy
+Buy := close < LowerLimit ? false : Buy
+Sell := close < LowerLimit ? false : Sell
+Sell := close > UpperLimit ? false : Sell
+//Direction Filter (skip one signal if against market direction)
+DIR := iDir == 'up' ? 1 : iDir == 'down' ? -1 : 0
+Buy := DIR == -1 and low >= SignalLine[1] - GI * 2 ? false : Buy
+Sell := DIR == 1 and high <= SignalLine[1] + GI * 2 ? false : Sell
+//Conflicting Signals
+if Buy and Sell
+    Buy := false
+    Sell := false
+    LastSignal_Index := LastSignal_Index[1]
+    LastSignal_Index
+//----<Cooldown>---------------------------------------------------------------------------------//
+y = 0
+for i = 1 to iCool by 1
+    if Buy[i] or Sell[i]
+        y := 0
+        break
+    y += 1
+    y
+CoolDown = y
+Buy := CoolDown < iCool ? false : Buy
+Sell := CoolDown < iCool ? false : Sell
+//----<Trackers>---------------------------------------------------------------------------------//
+LastSignal := Buy ? 1 : Sell ? -1 : LastSignal[1]
+LastSignal_Index := Buy ? BuyLine_Index : Sell ? SellLine_Index : LastSignal_Index[1]
+SignalLine := Get_Array_Values(a_grid, LastSignal_Index)
+//Reset to Center Grid when LMA changes
+if iReset
+    SignalLine := LMA < LMA[1] ? UpperLimit : SignalLine
+    SignalLine := LMA > LMA[1] ? LowerLimit : SignalLine
+    SignalLine
+BuyLine := Get_Array_Values(a_grid, BuyLine_Index)
+SellLine := Get_Array_Values(a_grid, SellLine_Index)
+//----<Plot Grids>--------------------------//
+color apColor = na
+apColor := MA < AP ? color.new(color.red, iGT) : MA > AP ? color.new(color.green, iGT) : apColor[1]
+apColor := LMA != LMA[1] ? na : apColor
+plot(G >= 8 ? G0 : na, color=GreenGrid)
+plot(G >= 6 ? G1 : na, color=GreenGrid)
+plot(G >= 4 ? G2 : na, color=GreenGrid)
+plot(G >= 2 ? G3 : na, color=GreenGrid)
+plot(G4, color=apColor, linewidth=4)  // Center
+plot(G >= 2 ? G5 : na, color=RedGrid)
+plot(G >= 4 ? G6 : na, color=RedGrid)
+plot(G >= 6 ? G7 : na, color=RedGrid)
+plot(G >= 8 ? G8 : na, color=RedGrid)
+//fill 
+LineAbove = SignalLine == UpperLimit ? SignalLine : SignalLine + GI
+LineBelow = SignalLine == LowerLimit ? SignalLine : SignalLine - GI
+a = plot(LineAbove, color=color.new(color.red, 100), style=plot.style_circles)
+b = plot(LineBelow, color=color.new(color.green, 100), style=plot.style_circles)
+boxColor = LastSignal == 1 ? color.new(color.green, iFT) : color.new(color.red, iFT)
+if iRFC
+    boxColor := LastSignal == -1 ? color.new(color.green, iFT) : color.new(color.red, iFT)
+    boxColor
+fill(a, b, color=boxColor)
+//----<Plot Signals>-----------------------------------------------------------------------------//
+plotchar(Buy and iSS == 'small', 'Buy', color=color.new(LimeGreen, 0), size=size.tiny, location=location.belowbar, char='▲')
+plotchar(Sell and iSS == 'small', 'Sell', color=color.new(Crimson, 0), size=size.tiny, location=location.abovebar, char='▼')
+plotchar(Buy and iSS == 'large', 'Buy', color=color.new(LimeGreen, 0), size=size.small, location=location.belowbar, char='▲')
+plotchar(Sell and iSS == 'large', 'Sell', color=color.new(Crimson, 0), size=size.small, location=location.abovebar, char='▼')
+//----<Alerts>-----------------------------------------------------------------------------------//
+alertcondition(condition=Buy, title='buy', message='buy')
+alertcondition(condition=Sell, title='sell', message='sell')
+//-----------------------------------------------------------------------------------------------//
+

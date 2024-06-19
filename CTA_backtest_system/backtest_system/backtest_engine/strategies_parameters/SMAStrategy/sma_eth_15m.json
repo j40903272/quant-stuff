@@ -1,0 +1,40 @@
+{
+    "prepare_data_param": {
+      "fast_sma_period": 9,
+      "slow_sma_period": 20,
+      "resample": "15min"
+    },
+    "trading_data_param": {
+      "SL_mode": "static_price",
+      "SL_pct": 0.03,
+      "TP_mode": "static_price",
+      "TP_ratio": 1.66,
+      "no_of_layer": 1
+    },
+    "target_fields": [
+      "open",
+      "high",
+      "low",
+      "close",
+      "slow_sma",
+      "fast_sma",
+      "prev_slow_sma",
+      "prev_fast_sma"
+    ],
+    "symbol": "ETHUSDT_UPERP",
+    "strategy_class": "SMAStrategy",
+    "exchange": "BINANCE",
+    "name": "SMA_ETH_15m",
+    "short_code" : "SMA_ETH_15m",
+    "strategy_details":{
+      "designer":"Kevin Yin",
+      "design_date": "2023-06-05",
+      "status": "alpha_pool"
+    },
+    "asset_info":{
+      "asset_class": "CRYPTO"
+    },
+    "account_info":{
+      "capital": 1000
+    }
+  }

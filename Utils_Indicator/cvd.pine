@@ -1,0 +1,91 @@
+// This source code is subject to the terms of the Mozilla Public License 2.0 at https://mozilla.org/MPL/2.0/
+// © seanhung07
+
+//@version=5
+// indicator('Cumulative Volume Delta', overlay = true)
+strategy("CVD", 
+     overlay=true, 
+     currency=currency.USD,
+     initial_capital=1000, 
+     default_qty_type=strategy.cash, 
+     default_qty_value=1000, 
+     commission_type=strategy.commission.percent, 
+     commission_value=0.04, 
+     margin_long = 1./2*20, 
+     margin_short = 1./2*20)
+upper_wick = close > open ? high - close : high - open
+lower_wick = close > open ? open - low : close - low
+spread = high - low
+body_length = spread - (upper_wick + lower_wick)
+
+percent_upper_wick = upper_wick / spread
+percent_lower_wick = lower_wick / spread
+percent_body_length = body_length / spread
+
+
+buying_volume = close > open ? (percent_body_length + (percent_upper_wick + percent_lower_wick) / 2) * volume : (percent_upper_wick + percent_lower_wick) / 2 * volume
+selling_volume = close < open ? (percent_body_length + (percent_upper_wick + percent_lower_wick) / 2) * volume : (percent_upper_wick + percent_lower_wick) / 2 * volume
+
+cumulation_length = input(14)
+cumulative_buying_volume = ta.ema(buying_volume, cumulation_length)
+cumulative_selling_volume = ta.ema(selling_volume, cumulation_length)
+
+fill_color = cumulative_buying_volume > cumulative_selling_volume ? color.green : cumulative_buying_volume < cumulative_selling_volume ? color.red : color.yellow
+
+volume_strength_wave = cumulative_buying_volume > cumulative_selling_volume ? cumulative_buying_volume : cumulative_selling_volume
+ema_volume_strength_wave = ta.ema(volume_strength_wave, cumulation_length)
+
+cumulative_volume_delta = cumulative_buying_volume - cumulative_selling_volume
+fast_length = input(title="Fast Length", defval=12)
+slow_length = input(title="Slow Length", defval=26)
+src = input(title="Source", defval=close)
+signal_length = input.int(title="Signal Smoothing",  minval = 1, maxval = 50, defval = 9)
+sma_source = input.string(title="Oscillator MA Type",  defval="EMA", options=["SMA", "EMA"])
+sma_signal = input.string(title="Signal Line MA Type", defval="EMA", options=["SMA", "EMA"])
+// Plot colors
+col_macd = input(#2962FF, "MACD Line  ", group="Color Settings", inline="MACD")
+col_signal = input(#FF6D00, "Signal Line  ", group="Color Settings", inline="Signal")
+col_grow_above = input(#26A69A, "Above   Grow", group="Histogram", inline="Above")
+col_fall_above = input(#B2DFDB, "Fall", group="Histogram", inline="Above")
+col_grow_below = input(#FFCDD2, "Below Grow", group="Histogram", inline="Below")
+col_fall_below = input(#FF5252, "Fall", group="Histogram", inline="Below")
+// Calculating
+fast_ma = sma_source == "SMA" ? ta.sma(src, fast_length) : ta.ema(src, fast_length)
+slow_ma = sma_source == "SMA" ? ta.sma(src, slow_length) : ta.ema(src, slow_length)
+
+lag = math.floor((fast_length- 1) / 2)
+zlema = ta.ema(src + (src - src[lag]), fast_length)
+lag_slow = math.floor((slow_length- 1) / 2)
+zsema = ta.ema(src + (src - src[lag_slow]), slow_length)
+
+macd = zlema - zsema
+lag_signal = math.floor((signal_length- 1) / 2)
+zsignal =  ta.ema(macd + (macd - macd[lag_signal]), signal_length)
+signal = sma_signal == "SMA" ? ta.sma(macd, signal_length) : ta.ema(macd, signal_length)
+hist = macd - zsignal
+
+trigger1 = false
+trigger2 = false
+if ta.crossover(macd , signal)
+    trigger2:= false
+    trigger1 := true
+if ta.crossunder(macd, signal)
+    trigger1 := false
+    trigger2 := true
+buy = trigger1 and cumulative_volume_delta >  0 and cumulative_volume_delta[1] < 0 //and (cumulative_volume_delta - math.abs(cumulative_volume_delta[1]))/ math.abs(cumulative_volume_delta[1]) > 0.2
+sell = trigger2 and cumulative_volume_delta < 0 and cumulative_volume_delta[1] > 0
+plotshape(sell, "sell", shape.circle, location.abovebar, color=color.red, size=size.tiny)
+plotshape(buy, "buy", shape.circle, location.belowbar, color=color.green, size=size.tiny)
+
+short_stopPer = input(5.0, title='Short Stop Loss %') / 100
+short_takePer = input(10.0, title='Short Take Profit %') / 100
+long_stopPer = input(5.0, title='long Stop Loss %') / 100
+long_takePer = input(10.0, title='long Take Profit %') / 100
+
+limit_takePer = input(5.0, title='long limit Take Profit %') / 100
+limit_stopPer = input(10.0, title='long limit Stop Loss %') / 100
+
+longStop = strategy.position_avg_price  * (1 - long_stopPer)
+shortStop = strategy.position_avg_price * (1 + short_stopPer)
+shortTake = strategy.position_avg_price * (1 - short_takePer)
+longTake = strategy.position_avg_price * (1 + long_takePer)

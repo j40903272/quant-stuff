@@ -1,0 +1,177 @@
+{
+    "Universe": [
+        "source=TSE|type=SECURITY|pid=2377",
+        "source=TAIFEX|type=FUTURE|cpid=GIFC1",
+        "source=TSE|type=SECURITY|pid=2610",
+        "source=TAIFEX|type=FUTURE|cpid=DBFC1"
+    ],
+    "AlphaTree": {
+        "caching_on": false
+    },
+    "Strategy": {
+        "RieslingStrategy": {
+            "Ensembles": [
+                {
+                    "Riesling": {
+                        "predict_symbol": "source=TSE|type=SECURITY|pid=2377",
+                        "fit_weight": 0.7,
+                        "max_position": 50,
+                        "min_order_qty": 1,
+                        "max_order_qty_stf": 5,
+                        "max_order_qty_stock": 10,
+                        "max_expose_lot": 5,
+                        "stf_trigger": true,
+                        "sell_six": true,
+                        "start_trading_time": "09:00:00.000000000",
+                        "position_closing_time": "13:23:55.000000000",
+                        "end_event_loop_time": "13:24:00.000000000",
+                        "is_order_twse1": true,
+                        "limit_offset_percent": 0.02,
+                        "limit_percent": 0.01,
+                        "basis_threshold_sell": 0.003,
+                        "basis_threshold_buy": -0.003,
+                        "dynamic_shift_coef_sell": 0.003,
+                        "dynamic_shift_coef_buy": 0.003,
+                        "stop_loss_rate": 0.03,
+                        "fit_outcome": "Snapshot_MessageInterval_2377_10-Signal_ForwardMidReturn_2377_SingleTickInterval_2377_5",
+                        "fit_tag": "2377.2022.09.27.23.06.26.0",
+                        "stock_experiment": false,
+                        "future_experiment": false,
+                        "hedge_experiment": false,
+                        "cancel_threshold_by_tick": 0.5,
+                        "stock": "source=TSE|type=SECURITY|pid=2377",
+                        "future": "source=TAIFEX|type=FUTURE|cpid=GIFC1",
+                        "sub_session_id": 4,
+                        "maximum_drawdown": -25844.511999999995,
+                        "end_date": "2022-09-27",
+                        "output_root": "/home/lgt/AP/alphaone/RieslingStrategy/output/"
+                    },
+                    "symbol": "source=TSE|type=SECURITY|pid=2377"
+                },
+                {
+                    "Riesling": {
+                        "predict_symbol": "source=TSE|type=SECURITY|pid=2610",
+                        "fit_weight": 1.8,
+                        "max_position": 100,
+                        "min_order_qty": 1,
+                        "max_order_qty_stf": 20,
+                        "max_order_qty_stock": 40,
+                        "max_expose_lot": 20,
+                        "stf_trigger": true,
+                        "sell_six": true,
+                        "start_trading_time": "09:00:00.000000000",
+                        "position_closing_time": "13:23:55.000000000",
+                        "end_event_loop_time": "13:24:00.000000000",
+                        "is_order_twse1": true,
+                        "limit_offset_percent": 0.02,
+                        "limit_percent": 0.01,
+                        "basis_threshold_sell": 0.001,
+                        "basis_threshold_buy": -0.02,
+                        "dynamic_shift_coef_sell": 0.003,
+                        "dynamic_shift_coef_buy": 0.003,
+                        "stop_loss_rate": 0.03,
+                        "fit_outcome": "Snapshot_MessageInterval_2610_10-Signal_ForwardMidReturn_2610_SingleTickInterval_2610_8",
+                        "fit_tag": "2610.2022.09.23.16.42.39.0",
+                        "stock_experiment": false,
+                        "future_experiment": false,
+                        "hedge_experiment": false,
+                        "cancel_threshold_by_tick": 0.2,
+                        "stock": "source=TSE|type=SECURITY|pid=2610",
+                        "future": "source=TAIFEX|type=FUTURE|cpid=DBFC1",
+                        "sub_session_id": 0,
+                        "maximum_drawdown": -4957.178399999999,
+                        "end_date": "2022-09-27",
+                        "output_root": "/home/lgt/AP/alphaone/RieslingStrategy/output/"
+                    },
+                    "symbol": "source=TSE|type=SECURITY|pid=2610"
+                }
+            ],
+            "SysID": "Je"
+        }
+    },
+    "Position": {
+        "Underlying": {
+            "fee_rate": 5.2e-05,
+            "tax_rate": 0.0015,
+            "fee_cost": 0.0
+        },
+        "Derivative": {
+            "fee_rate": 2e-05,
+            "tax_rate": 0.0,
+            "fee_cost": 0.0025
+        }
+    },
+    "MetricReporter": {
+        "interval": "00:01:00.000000000",
+        "writer_path": "/home/lgt/AP/alphaone/RieslingStrategy/output/metric/",
+        "writer_name": "Riesling",
+        "enable_event_log": false,
+        "counter_interval": "SingleTickInterval",
+        "counter_interval_value": 5,
+        "start_time": "09:00:00:00000000",
+        "end_time": "13:30:00:00000000"
+    },
+    "MarketData": {
+        "fileroot": "/var/files/",
+        "marketcode": "Day",
+        "location": "BQ-HFT50-49"
+    },
+    "OrderSource": {
+        "Taifex": {
+            "NatsSQLConnection": "nats://10.220.9.12:4222",
+            "SystemID": "HFT50-49_core11.RieslingStrategy"
+        },
+        "TWSE": {
+            "Enable": 1,
+            "NatsSQLConnection": "nats://10.220.9.12:4222",
+            "SystemName": "Riesling",
+            "SystemIndex": 11
+        }
+    },
+    "System": {
+        "stock_userdefine": "362 Ja",
+        "future_userdefine": "2004Ja",
+        "nats_server": "nats://10.220.9.12:4222",
+        "sql_server": "nats://10.220.9.12:4222",
+        "command_port": "Riesling",
+        "rate_limit": 50,
+        "twse_account_name": "0000000",
+        "packetlog": false,
+        "affinity": 11
+    },
+    "Providers": {
+        "AlphaOne": {
+            "fileroot": "/home/u14281/git/simulation-pipeline/marketdata/",
+            "marketcode": "",
+            "location": "",
+            "filename": "2377.marketdata_sp.bin"
+        }
+    },
+    "Simulation": {
+        "simulation_mode": "FilledByBookDiffAndTrade",
+        "passive_forward_delay_avg": 0.0008,
+        "aggressive_forward_delay_avg": 0.0008,
+        "passive_backward_delay_avg": 0.0002,
+        "aggressive_backward_delay_avg": 0.0002,
+        "rod_report_delay_avg": 0.0001,
+        "peek_number_of_levels": 5,
+        "match_time": 2e-05,
+        "is_optimistic_when_filled_by_bookdiff": false,
+        "timer_mode": "PacketEnd",
+        "market_impact_reset_mode": 2,
+        "numbers_of_trade_to_check": 5,
+        "order_shift": 0.001,
+        "possible_trades_window": 0.002
+    },
+    "MarketByOrderBook": {
+        "is_trading_through_delete": false,
+        "is_touching_on_delete": false
+    },
+    "ReferenceData": {
+        "retrieving_days": 30
+    },
+    "AlphaReader": {
+        "path": "/home/u14281/git/simulation-pipeline/output//2377.2022.09.27.23.06.26.0/",
+        "name": "2377"
+    }
+}

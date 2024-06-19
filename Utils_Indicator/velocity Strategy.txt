@@ -1,0 +1,44 @@
+// This source code is subject to the terms of the Mozilla Public License 2.0 at https://mozilla.org/MPL/2.0/
+// © liushihwei0712
+//@version=4
+strategy(title="HHMA24", overlay=false, initial_capital = 10000 , default_qty_type=strategy.percent_of_equity, default_qty_value=100,commission_type = strategy.commission.percent, commission_value = 0.05)
+// strategy(title="HHMA24", overlay=true, initial_capital = 10000 , default_qty_type= strategy.cash, default_qty_value=10000,commission_type = strategy.commission.percent, commission_value = 0.05)//strategy.percent_of_equity
+period1 = input(84,title = 'period 1')
+period2 = input(24,title = 'period 2')
+period3 = input(336,title = 'period 3')
+
+
+ema3 =  ema(close,period3) 
+ema1 = ema(close,period1)
+ema2 = ema(close,period2)
+
+
+priceDiffPeriod = input(72,title = 'priceDiffPeriod')
+priceDiff = (close - open)/open*100
+priceDiffAverage = hma(priceDiff,priceDiffPeriod)
+priceDiffAverageTwo = hma(priceDiffAverage,int(priceDiffPeriod*1.5))
+
+
+plot(priceDiffAverage,color = color.red)
+plot(priceDiffAverageTwo,color = color.yellow)
+
+
+
+profit_long = (close-strategy.position_avg_price)/strategy.position_avg_price
+closeStatus =  profit_long > 0 ? "win" : "lose"
+closeStatus_short = closeStatus == "win" ? "lose" : "win"
+// ============================================================================================開始策略 =====================================================================
+bullish = ema1 > ema3
+LC_in1 = crossover(priceDiffAverage,priceDiffAverageTwo) and bullish and close <= open and ema3 > ema3[1]
+LC_out1 =  ((priceDiffAverage < priceDiffAverageTwo ) and (priceDiffAverage[1] < priceDiffAverageTwo[1] )and (priceDiffAverage[2] < priceDiffAverageTwo[2] ))
+
+
+if time>=timestamp(2015,01,01) and time<=timestamp(2030,12,31)
+
+// =========================================================================================================================多單
+    if  (LC_in1 and strategy.opentrades==0 )
+        strategy.order("Long", true,comment="Long1")
+	strategy.close("Long",when= LC_out1,comment=closeStatus)
+	strategy.exit("Close Long","Long", stop=strategy.position_avg_price*(0.95), comment= "5%") //止損5%
+
+

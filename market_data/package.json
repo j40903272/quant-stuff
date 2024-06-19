@@ -1,0 +1,5 @@
+{
+  "dependencies": {
+    "@mathieuc/tradingview": "^3.4.1"
+  }
+}

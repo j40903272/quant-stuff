@@ -1,0 +1,105 @@
+// This source code is subject to the terms of the Mozilla Public License 2.0 at https://mozilla.org/MPL/2.0/
+// © seanhung07
+
+//@version=5
+indicator("Alex Liquidation", overlay=true)
+
+type liq_level
+    int start_idx
+    float price
+    int leverage
+    int side
+
+LONG = 1
+SHORT = -1
+
+string userSymbol = 'BINANCE' + ":" + string(syminfo.basecurrency) + 'USDT.P'
+string Formula = str.format("{0}_OI", userSymbol)
+OI = request.security(Formula, timeframe.period, close)
+OI_delta = (OI - nz(OI[1])) + volume
+
+maLength = input(60, title="MA Length")
+arr_size = input.int(1000)
+hist_bins = input.int(150)
+
+numOfLines = 500
+
+OI_delta_MA = ta.vwma(OI_delta, maLength)
+OI_delta_abs = math.abs(OI_delta)
+OI_delta_abs_MA = ta.sma(OI_delta_abs, maLength)
+ // Replace with your actual calculation if different
+h3 = input.float(0.90, title="Large Liquidation Level (90th Percentile)")
+h2 = input.float(0.75, title="Middle Liquidation Level (75th Percentile)")
+h1 = input.float(0.50, title="Small Liquidation Level (50th Percentile)")
+// maLength = input.int(14, title="Moving Average Length")
+
+percentileRank(value, length) =>
+    sum = 0.0
+    for i = 0 to length - 1
+        sum := sum + (value > ta.highest(OI_delta_abs, length)[i] ? 1 : 0)
+    rank = sum / length
+    rank
+
+latest_rank = percentileRank(OI_delta_abs, maLength)
+
+
+// Assuming OI_delta_abs and OI_delta are already defined
+
+OI_delta_open_h3 = latest_rank >= h3 and OI_delta > 0
+OI_delta_open_h2 = latest_rank >= h2 and latest_rank < h3 and OI_delta > 0
+OI_delta_open_h1 = latest_rank >= h1 and latest_rank < h2 and OI_delta > 0
+
+kline_price = (close + close + high + low) / 4
+
+local_high = ta.highest(high, 120)
+local_low = ta.lowest(low, 120)
+rangeHigh = local_high * (1 + local_high / local_low / 10)
+rangeLow = local_low * (1 - local_high / local_low / 10)
+
+var liq_arr = array.new<liq_level>()
+
+get_liq_price(side, leverage) =>
+    kline_price * (1 - side * 1 / leverage)
+
+get_liq_level(side, leverage) =>
+    liq_level.new(bar_index, get_liq_price(side, leverage), leverage, side)
+
+append_liq_arr(arr, liq) =>
+    if array.size(arr) == arr_size
+        array.shift(arr)
+    array.push(arr, liq)
+
+if OI_delta_open_h3 or OI_delta_open_h2
+    append_liq_arr(liq_arr, get_liq_level(LONG, 50))
+    append_liq_arr(liq_arr, get_liq_level(SHORT, 50))
+    append_liq_arr(liq_arr, get_liq_level(LONG, 100))
+    append_liq_arr(liq_arr, get_liq_level(SHORT, 100))
+
+levels = array.new<float>(4, close)
+
+if array.size(liq_arr) > 0
+    tmp_arr = array.new<float>()
+    j = 0
+    for side in array.from(SHORT, LONG)
+        for leverage in array.from(50, 100)
+            array.clear(tmp_arr)
+            for i = 0 to array.size(liq_arr) - 1
+                ll = array.get(liq_arr, i)
+                if ll.side == side and ll.leverage == leverage
+                    array.push(tmp_arr, ll.price)
+            if array.size(tmp_arr) > 0
+                array.set(levels, j, array.percentile_nearest_rank(tmp_arr, SHORT ? 95 : 5))
+            j += 1
+
+plot(array.get(levels, 0), color=color.rgb(240, 161, 41, 30))
+plot(array.get(levels, 1), color=color.rgb(218, 55, 101, 30))
+plot(array.get(levels, 2), color=color.rgb(240, 161, 41, 30))
+plot(array.get(levels, 3), color=color.rgb(218, 55, 101, 30))
+// plot(close)
+
+
+if array.size(liq_arr) > 0
+    for i = array.size(liq_arr) - 1 to 0
+        ll = array.get(liq_arr, i)
+        if (ll.side == LONG and low < ll.price) or (ll.side == SHORT and high > ll.price) or ll.price < rangeLow or ll.price > rangeHigh
+            array.remove(liq_arr, i)

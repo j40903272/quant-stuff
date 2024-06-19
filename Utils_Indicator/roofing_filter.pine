@@ -1,0 +1,43 @@
+// This source code is subject to the terms of the Mozilla Public License 2.0 at https://mozilla.org/MPL/2.0/
+// © seanhung07
+
+//@version=5
+indicator("roofing filter")
+
+i_low_pass = input.int(10, "low pass period (higher => lower freq)")
+i_high_pass = input.int(48, "low pass period (lower => higher freq)")
+
+r2d(x) =>
+    x * math.pi / 180
+
+cos(x) =>
+    math.cos(r2d(x))
+
+sin(x) =>
+    math.sin(r2d(x))
+
+sqrt2 = math.sqrt(2)
+
+source = close
+
+x1 = sqrt2 / 2 * 360 / i_high_pass
+alpha1 = (cos(x1) + sin(x1) - 1) / cos(x1)
+hp = 0.
+if bar_index > 23
+    hp := (1 - alpha1 / 2) * (1 - alpha1 / 2) * (source - 2 * source[1] + source[2]) + 2 * (1 - alpha1) * hp[1] - (1 - alpha1) * (1 - alpha1) * hp[2]
+
+a1 = math.exp(-math.sqrt(2) * math.pi / i_low_pass)
+b1 = 2 * a1 * cos(math.sqrt(2) * 180 / i_low_pass)
+c2 = b1
+c3 = -a1 * a1
+c1 = 1 - c2 - c3
+filt = 0.
+if bar_index >= 2
+    filt := c1 * (hp + hp[1]) / 2 + c2 * filt[1] + c3 * filt[2]
+
+stoch = ta.stoch(close, close, close, 21)
+stoch2 = ta.stoch(filt, filt, filt, 21)
+// plot(roofing(rsi))
+plot(stoch, color=color.red)
+plot(stoch2)
+hline(0)

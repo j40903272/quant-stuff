@@ -1,0 +1,4 @@
+python-binance==1.0.19
+requests==2.31.0
+websocket-client==1.6.4
+rel==0.4.9.5

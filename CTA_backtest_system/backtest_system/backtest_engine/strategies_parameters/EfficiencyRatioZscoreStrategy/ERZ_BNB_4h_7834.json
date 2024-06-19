@@ -1,0 +1,44 @@
+{
+  "prepare_data_param": {
+    "er_p": 40,
+    "zscore_p": 40,
+    "resample": "240min"
+},
+  "trading_data_param": {
+    "SL_mode": "static_price",
+    "SL_pct": 0.06,
+    "TP_mode": "static_price",
+    "TP_ratio": 1.2,
+    "no_of_layer": 1
+  },
+  "target_fields": [
+      "open",
+      "high",
+      "low",
+      "close",
+      "price_delta",
+      "total_price_delta",
+      "delta_abs_sum",
+      "efficiency_ratio",
+      "efficiency_ratio_avg",
+      "efficiency_ratio_stddev",
+      "efficiency_ratio_zscore",
+      "prev_efficiency_ratio_zscore"
+  ],
+  "symbol": "BNBUSDT_UPERP",
+  "strategy_class": "EfficiencyRatioZscoreStrategy",
+  "exchange": "BINANCE",
+  "name": "ERZ_BNB_4h_7834",
+  "short_code" : "ERZ_BNB_4h_7834",
+  "strategy_details":{
+    "designer":"William_Chou",
+    "design_date": "2022-11-08",
+    "status": "alpha_pool"
+  },
+  "asset_info":{
+    "asset_class": "CRYPTO"
+  },
+  "account_info":{
+    "capital": 1000
+  }
+}

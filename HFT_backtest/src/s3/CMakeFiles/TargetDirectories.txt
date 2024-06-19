@@ -1,0 +1,3 @@
+/home/ubuntu/s3/CMakeFiles/s3.dir
+/home/ubuntu/s3/CMakeFiles/edit_cache.dir
+/home/ubuntu/s3/CMakeFiles/rebuild_cache.dir

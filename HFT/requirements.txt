@@ -1,0 +1,7 @@
+discord==latest_version
+threading==latest_version
+websocket-client==latest_version
+nest_asyncio==latest_version
+pyqt5==latest_version
+ccxt==latest_version
+python-binance==latest_version
